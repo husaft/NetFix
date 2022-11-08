@@ -1,2 +1,2 @@
 # NetFix
-Patches .NET assemblies automatically
+.NET module/assembly patcher program
