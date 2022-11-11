@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Linq;
 using dnlib.DotNet;
-using dnlib.DotNet.Writer;
 using NetFix.Tools;
 
 namespace NetFix.Core
@@ -31,7 +30,6 @@ namespace NetFix.Core
                     continue;
 
                 var asm = mod.Assembly;
-                var isDirty = false;
                 var refs = mod.GetAssemblyRefs().OrderBy(a => a.FullName).ToArray();
                 var isFirst = true;
                 foreach (var assRef in refs)
@@ -47,19 +45,6 @@ namespace NetFix.Core
                     }
                     Console.WriteLine($"     > {assRef}");
                 }
-
-                if (!isDirty)
-                    continue;
-
-                var oneName = Path.GetFileName(file);
-                var tfPath = Path.Combine(output, oneName);
-                var pfPath = tfPath.Replace(".dll", ".pdb")
-                    .Replace(".exe", ".pdb");
-                var modOpt = new ModuleWriterOptions(mod)
-                {
-                    WritePdb = true, PdbFileName = pfPath
-                };
-                mod.Write(tfPath, modOpt);
             }
 
             Console.WriteLine();
