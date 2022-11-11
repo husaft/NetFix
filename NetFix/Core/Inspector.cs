@@ -21,22 +21,30 @@ namespace NetFix.Core
             var files = Directory.GetFiles(input, "*.dll", o)
                 .Concat(Directory.GetFiles(input, "*.exe", o));
 
+            var hasTerms = options.Terms.Any();
             foreach (var file in files)
             {
                 var label = IoUtil.GetRelative(input, file);
-                Console.WriteLine($" * {label}");
-
                 var ctx = ModuleDef.CreateModuleContext();
                 using var mod = TryLoad(file, ctx);
                 if (mod == null)
                     continue;
 
                 var asm = mod.Assembly;
-                Console.WriteLine($"   - {asm}");
-
                 var isDirty = false;
-                foreach (var assRef in mod.GetAssemblyRefs().OrderBy(a => a.FullName))
+                var refs = mod.GetAssemblyRefs().OrderBy(a => a.FullName).ToArray();
+                var isFirst = true;
+                foreach (var assRef in refs)
                 {
+                    var include = !hasTerms || options.Terms.Any(t => t == assRef.Name);
+                    if (!include)
+                        continue;
+                    if (isFirst)
+                    {
+                        Console.WriteLine($" * {label}");
+                        Console.WriteLine($"   - {asm}");
+                        isFirst = false;
+                    }
                     Console.WriteLine($"     > {assRef}");
                 }
 
