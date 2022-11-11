@@ -32,7 +32,7 @@ namespace NetFix.Core
                 Console.WriteLine($"   - {asm}");
 
                 var isDirty = false;
-                foreach (var assRef in mod.GetAssemblyRefs())
+                foreach (var assRef in mod.GetAssemblyRefs().OrderBy(a => a.FullName))
                 {
                     Console.WriteLine($"     > {assRef}");
                 }
