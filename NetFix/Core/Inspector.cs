@@ -27,7 +27,10 @@ namespace NetFix.Core
                 Console.WriteLine($" * {label}");
 
                 var ctx = ModuleDef.CreateModuleContext();
-                using var mod = ModuleDefMD.Load(file, ctx);
+                using var mod = TryLoad(file, ctx);
+                if (mod == null)
+                    continue;
+
                 var asm = mod.Assembly;
                 Console.WriteLine($"   - {asm}");
 
@@ -53,6 +56,18 @@ namespace NetFix.Core
 
             Console.WriteLine();
             Console.WriteLine("Done.");
+        }
+
+        private static ModuleDef TryLoad(string file, ModuleContext ctx)
+        {
+            try
+            {
+                return ModuleDefMD.Load(file, ctx);
+            }
+            catch (BadImageFormatException)
+            {
+                return null;
+            }
         }
     }
 }
