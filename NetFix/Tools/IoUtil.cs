@@ -29,7 +29,7 @@ namespace NetFix.Tools
                 .Replace("System.Collections.Generic.", "")
                 .Replace("Newtonsoft.Json.Linq.", string.Empty);
 
-        public static string ToStr(MethodDef method, TypeDef type)
+        public static string ToStr(IMemberDef method, TypeDef type)
         {
             return Simple(method.ToString()
                 .Replace($"{type.FullName}::", string.Empty)

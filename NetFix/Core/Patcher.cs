@@ -70,12 +70,14 @@ namespace NetFix.Core
                             isDirty = true;
                         }
 
-                        foreach (var oneMeth in oneType.Methods
+                        foreach (var oneMeth in oneType.Methods.Cast<IMemberDef>()
                                      .Select(i => (i.Name, m: i))
                                      .Concat(oneType.Properties
-                                         .Select(p => (p.Name, m: p.GetMethod)))
+                                         .Select(p => (p.Name, m: (IMemberDef)p.GetMethod)))
                                      .Concat(oneType.Properties
-                                         .Select(p => (p.Name, m: p.SetMethod))))
+                                         .Select(p => (p.Name, m: (IMemberDef)p.SetMethod)))
+                                     .Concat(oneType.Fields.Cast<IMemberDef>()
+                                         .Select(f => (f.Name, m: f))))
                         {
                             if (oneMeth.m == null)
                                 continue;
@@ -89,9 +91,12 @@ namespace NetFix.Core
                             var debug = IoUtil.ToStr(oneMeth.m, oneType);
                             Console.WriteLine($"         > {debug}");
 
-                            oneMeth.m.Access = pro != null
-                                ? MethodAttributes.Family
-                                : MethodAttributes.Public;
+                            if (oneMeth.m is MethodDef md)
+                                md.Access = pro != null ? MethodAttributes.Family : MethodAttributes.Public;
+                            else if (oneMeth.m is FieldDef fd)
+                                fd.Access = pro != null ? FieldAttributes.Family : FieldAttributes.Public;
+                            else
+                                throw new InvalidOperationException(oneMeth.m.GetType().FullName);
                             isDirty = true;
                         }
                     }
