@@ -57,19 +57,26 @@ namespace NetFix.Core
                             isDirty = true;
                         }
 
-                        foreach (var oneMeth in oneType.Methods)
+                        foreach (var oneMeth in oneType.Methods
+                                     .Select(i => (i.Name, m: i))
+                                     .Concat(oneType.Properties
+                                         .Select(p => (p.Name, m: p.GetMethod)))
+                                     .Concat(oneType.Properties
+                                         .Select(p => (p.Name, m: p.SetMethod))))
                         {
+                            if (oneMeth.m == null)
+                                continue;
+
                             var mName = oneMeth.Name;
                             var pro = oType.Protected?.FirstOrDefault(p => p.Equals(mName));
                             var pub = oType.Public?.FirstOrDefault(p => p.Equals(mName));
-
                             if (pro == null && pub == null)
                                 continue;
 
-                            var debug = IoUtil.ToStr(oneMeth, oneType);
+                            var debug = IoUtil.ToStr(oneMeth.m, oneType);
                             Console.WriteLine($"         > {debug}");
 
-                            oneMeth.Access = pro != null
+                            oneMeth.m.Access = pro != null
                                 ? MethodAttributes.Family
                                 : MethodAttributes.Public;
                             isDirty = true;
