@@ -50,8 +50,15 @@ namespace NetFix.Core
                         Console.WriteLine($"       - {oneType}");
                         if (oType.Public?.Contains("@") ?? false)
                         {
-                            oneType.Attributes |= TypeAttributes.Public;
-                            if (oneType.IsSealed)
+                            if (oneType.IsNested)
+                            {
+                                if (oneType.IsNestedAssembly)
+                                    oneType.Attributes &= ~TypeAttributes.NestedAssembly;
+                                oneType.Attributes |= TypeAttributes.NestedPublic;
+                            }
+                            else
+                                oneType.Attributes |= TypeAttributes.Public;
+                            if (!oneType.IsEnum && oneType.IsSealed)
                                 oneType.Attributes &= ~TypeAttributes.Sealed;
                             Console.WriteLine($"         -> {oneType.Attributes}");
                             isDirty = true;
