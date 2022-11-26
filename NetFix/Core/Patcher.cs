@@ -51,6 +51,8 @@ namespace NetFix.Core
                         if (oType.Public?.Contains("@") ?? false)
                         {
                             oneType.Attributes |= TypeAttributes.Public;
+                            if (oneType.IsSealed)
+                                oneType.Attributes &= ~TypeAttributes.Sealed;
                             Console.WriteLine($"         -> {oneType.Attributes}");
                             isDirty = true;
                         }
