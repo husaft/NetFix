@@ -40,10 +40,16 @@ namespace NetFix.Core
                     var isDirty = false;
                     foreach (var oneType in mod.GetTypes())
                     {
-                        var oSpace = oneFile.Spaces.FirstOrDefault(s =>
-                            s.Name.Equals(oneType.Namespace));
-                        var oType = oSpace?.Types.FirstOrDefault(s =>
-                            s.Name.Equals(oneType.Name));
+                        var nsp = oneType.Namespace;
+                        var name = oneType.Name;
+                        if (nsp.Length == 0 && oneType.DeclaringType != null)
+                        {
+                            nsp = oneType.DeclaringType.Namespace;
+                            name = oneType.FullName[(nsp.Length + 1)..];
+                        }
+
+                        var oSpace = oneFile.Spaces.FirstOrDefault(s => s.Name.Equals(nsp));
+                        var oType = oSpace?.Types.FirstOrDefault(s => s.Name.Equals(name));
                         if (oType == null)
                             continue;
 
