@@ -48,6 +48,13 @@ namespace NetFix.Core
                             continue;
 
                         Console.WriteLine($"       - {oneType}");
+                        if (oType.Public?.Contains("@") ?? false)
+                        {
+                            oneType.Attributes |= TypeAttributes.Public;
+                            Console.WriteLine($"         -> {oneType.Attributes}");
+                            isDirty = true;
+                        }
+
                         foreach (var oneMeth in oneType.Methods)
                         {
                             var mName = oneMeth.Name;
